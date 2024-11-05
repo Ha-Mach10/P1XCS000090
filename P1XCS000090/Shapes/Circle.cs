@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace P1XCS000090.Shapes
 {
-	public struct Circle
+	public class Circle
 	{
 		// *******************************************************************************
 		// Static Readonly Fields
@@ -89,6 +89,14 @@ namespace P1XCS000090.Shapes
 		{
 			Id = id;
 		}
+
+
+
+		// *******************************************************************************
+		// Public Methods
+		// *******************************************************************************
+
+
 
 
 

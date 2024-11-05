@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace P1XCS000090.Shapes
 {
-	public struct Line
+	public class Line
 	{
 		// *******************************************************************************
 		// Static Readonly Fields
@@ -75,7 +75,7 @@ namespace P1XCS000090.Shapes
         {
 			dc.DrawLine(Pen, First, Second);
         }
-		public void DraftLine(DrawingContext dc, Point first, Point second, double ratio)
+		public void DraftLine(DrawingContext dc, Point first, Point second, double ratio, Point cursorPosition)
         {
 			Point f = new Point(first.X * ratio, first.Y * ratio);
 			Point s = new Point(second.X * ratio, second.Y * ratio);

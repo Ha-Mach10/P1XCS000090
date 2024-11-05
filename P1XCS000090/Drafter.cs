@@ -69,7 +69,7 @@ namespace P1XCS000090
 
 		private Brush _backGroundBrush = new SolidColorBrush(Color.FromRgb(24,25,28));
 		private Brush _foreGroundBrush = new SolidColorBrush(Colors.White);
-		private Point _mousePosition;
+		private Point _cursorPosition;
 		
 
 
@@ -168,10 +168,12 @@ namespace P1XCS000090
 			// 
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Drafter), new FrameworkPropertyMetadata(typeof(Drafter)));
 
+			/*
 			int lineSz = Marshal.SizeOf(typeof(Line));
 			int circleSz = Marshal.SizeOf(typeof(Circle));
 
 			int a = 0;
+			*/
 		}
 
 
@@ -208,11 +210,21 @@ namespace P1XCS000090
 			Point firstPoint1 = new Point(positionA, positionA);
 			Point secondPoint1 = new Point(positionB, positionB);
 
-			Vector vector = new Vector(_mousePosition.X * Ratio, _mousePosition.Y * Ratio);
+			
+			Vector vector = new Vector(_cursorPosition.X * Ratio, _cursorPosition.Y * Ratio);
 			Point firstPoint2 =  Point.Subtract(new Point(positionA, positionA), vector);
 			Point secondPoint2 = Point.Subtract(new Point(positionB, positionB), vector);
+			
+			/*
+			Matrix matrixFirst = new Matrix(100, 0, 0, 100, 0, 0);
+			Matrix matrixSecond = new Matrix(300, 0, 0, 300, 0, 0);
+			matrixFirst.Scale(Ratio, Ratio);
+			matrixSecond.Scale(Ratio, Ratio);
 
-			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), firstPoint2, secondPoint2);
+			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), new Point(matrixFirst.M11, matrixFirst.M22), new Point(matrixSecond.M11, matrixSecond.M22));
+			*/
+
+			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), CalculatePosition(firstPoint1, _cursorPosition, Ratio), CalculatePosition(secondPoint1, _cursorPosition, Ratio));
 		}
 		/// <summary>
 		/// テンプレートの適用を行うメソッド
@@ -275,7 +287,7 @@ namespace P1XCS000090
 				if (e.ClickCount is 2)
                 {
 					Ratio = 1;
-					_mousePosition = new Point(0, 0);
+					_cursorPosition = new Point(0, 0);
 					Reload = !Reload;
                 }
 			}
@@ -289,7 +301,7 @@ namespace P1XCS000090
 			IInputElement device = null;
 			device = e.Device as IInputElement;
 			// 現在のマウス位置を取得
-			_mousePosition = e.GetPosition(device);
+			_cursorPosition = e.GetPosition(device);
 
 			// ホイールのデルタ値を取得
 			int delta = e.Delta;
@@ -322,12 +334,21 @@ namespace P1XCS000090
 
 
 		// *********************************************************************
-		// Public Methods
+		// Private Methods
 		// *********************************************************************
 
-		public Point CalculatePosition(Point objectPosition, Vector cursorPosition)
+		private Point CalculatePosition(Point objectPosition, Point cursorPosition, double ratio)
         {
+			double resultPositionX =
+				objectPosition.X > cursorPosition.X ?
+				objectPosition.X * ratio + cursorPosition.X :
+				cursorPosition.X - objectPosition.X * ratio;
+			double resultPositionY =
+				objectPosition.Y > cursorPosition.Y ?
+				objectPosition.Y * ratio + cursorPosition.Y :
+				cursorPosition.Y - objectPosition.Y * ratio;
 
+			return new Point(resultPositionX, resultPositionY);
         }
 	}
 }
