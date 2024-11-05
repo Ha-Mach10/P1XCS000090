@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Runtime.InteropServices;
 
 using P1XCS000090.Commands;
 using P1XCS000090.Shapes;
@@ -78,8 +79,17 @@ namespace P1XCS000090
 		// *********************************************************************
 
 		public System.Drawing.Size Size { get; private set; }
+		/// <summary>
+		/// 画面倍率
+		/// </summary>
 		public double Ratio { get; private set; } = 1.0;
+		/// <summary>
+		/// 線分オブジェクト
+		/// </summary>
 		public List<Line> LineSize { get; private set; } = new List<Line>();
+		/// <summary>
+		/// 円オブジェクト
+		/// </summary>
 		public List<Circle> CircleSize { get; private set; } = new List<Circle>();
 
 
@@ -158,7 +168,10 @@ namespace P1XCS000090
 			// 
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Drafter), new FrameworkPropertyMetadata(typeof(Drafter)));
 
-			// 
+			int lineSz = Marshal.SizeOf(typeof(Line));
+			int circleSz = Marshal.SizeOf(typeof(Circle));
+
+			int a = 0;
 		}
 
 
@@ -192,10 +205,14 @@ namespace P1XCS000090
 
 			double positionA = 100 * Ratio;
 			double positionB = 300 * Ratio;
+			Point firstPoint1 = new Point(positionA, positionA);
+			Point secondPoint1 = new Point(positionB, positionB);
 
-			// Point firstPoint = Point.Subtract(new Point(positionA, positionB), _mousePosition);
+			Vector vector = new Vector(_mousePosition.X * Ratio, _mousePosition.Y * Ratio);
+			Point firstPoint2 =  Point.Subtract(new Point(positionA, positionA), vector);
+			Point secondPoint2 = Point.Subtract(new Point(positionB, positionB), vector);
 
-			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), new Point(positionA, positionA), new Point(positionB, positionB));
+			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), firstPoint2, secondPoint2);
 		}
 		/// <summary>
 		/// テンプレートの適用を行うメソッド
@@ -255,7 +272,12 @@ namespace P1XCS000090
 			}
 			if (e.MiddleButton == MouseButtonState.Pressed)
 			{
-
+				if (e.ClickCount is 2)
+                {
+					Ratio = 1;
+					_mousePosition = new Point(0, 0);
+					Reload = !Reload;
+                }
 			}
 		}
 
@@ -263,21 +285,23 @@ namespace P1XCS000090
 		{
 			base.OnMouseWheel(e);
 
+			// 入力デバイスを取得
 			IInputElement device = null;
 			device = e.Device as IInputElement;
-
+			// 現在のマウス位置を取得
 			_mousePosition = e.GetPosition(device);
 
+			// ホイールのデルタ値を取得
 			int delta = e.Delta;
 			if (delta > 0 && Ratio < 100)
 			{
-				Ratio = Ratio * 1.25;
+				Ratio = Ratio * 1.125;
 				Reload = !Reload;
 				// OnRender(_drawingContext);
 			}
 			else if (delta < 0 && Ratio >= 0.01)
 			{
-				Ratio = Ratio * 0.75;
+				Ratio = Ratio * 0.875;
 				Reload = !Reload;
 				// OnRender(_drawingContext);
 			}
@@ -294,5 +318,16 @@ namespace P1XCS000090
 				
 			}
 		}
+
+
+
+		// *********************************************************************
+		// Public Methods
+		// *********************************************************************
+
+		public Point CalculatePosition(Point objectPosition, Vector cursorPosition)
+        {
+
+        }
 	}
 }
