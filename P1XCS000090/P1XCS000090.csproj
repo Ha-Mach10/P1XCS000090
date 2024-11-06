@@ -57,8 +57,11 @@
     <Compile Include="Commands\WriteState.cs" />
     <Compile Include="Drafter.cs" />
     <Compile Include="Math\Affine.cs" />
-    <Compile Include="Shapes\Circle.cs" />
-    <Compile Include="Shapes\Line.cs" />
+    <Compile Include="Math\Coordinate.cs" />
+    <Compile Include="Math\OwnerOrigin.cs" />
+    <Compile Include="Shapes\DrCircle.cs" />
+    <Compile Include="Shapes\DrLine.cs" />
+    <Compile Include="Shapes\DrPoint.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

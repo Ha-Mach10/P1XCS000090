@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 
 namespace P1XCS000090.Shapes
 {
-	public class Circle
+	public class DrLine
 	{
 		// *******************************************************************************
 		// Static Readonly Fields
 		// *******************************************************************************
 
-		public static readonly Circle Empry;
+		public static readonly DrLine Empty;
 
 
 
@@ -30,62 +31,32 @@ namespace P1XCS000090.Shapes
 		// *******************************************************************************
 
 		public int Id { get; }
-		public Point Center { get; }
-		public double Radius { get; }
-
-		/// <summary>
-		/// 四半円点を格納する配列
-		/// </summary>
-		public Point[] QuadrantPoints { get; }
+		public Point First { get; }
+		public Point Second { get; }
+		public Point CenterPoint { get; }
+		public Pen Pen { get; }
 
 
 
 		// *******************************************************************************
-		// Constructor
+		// Constructors
 		// *******************************************************************************
 
-		public Circle(Point center, double radius, bool isDirmeter = false)
+		public DrLine(Point first, Point second, Pen pen)
 		{
 			_idCount++;
 
 			Id = _idCount;
+			First = first;
+			Second = second;
+			Pen = pen;
 
-			Center = center;
-
-			if (isDirmeter is false)
-			{
-				Radius = radius;
-			}
-			else
-			{
-				Radius = radius / 2;
-			}
-
-			QuadrantPoints = new Point[4];
-
-			for (int i = 0; i < 4; i++)
-			{
-				Point qp = new Point();
-				switch (i)
-				{
-					case 0:
-						qp = Point.Subtract(Center, new Vector(Radius, 0));
-						break;
-					case 1:
-						qp = Point.Subtract(Center, new Vector(0, Radius));
-						break;
-					case 2:
-						qp = Point.Subtract(Center, new Vector(-Radius, 0.0));
-						break;
-					case 3:
-						qp = Point.Subtract(Center, new Vector(0, -Radius));
-						break;
-				}
-				QuadrantPoints[i] = qp;
-			}
+			double x = First.X <= Second.X ? First.X - Second.X : Second.X - First.X;
+			double y = First.Y >= Second.Y ? First.Y - Second.Y : Second.Y - First.Y;
+			CenterPoint = new Point(x, y);
 		}
-		public Circle(int id, Point center, float radius, bool isDirmeter = false)
-			: this(center, radius, isDirmeter)
+		public DrLine(int id, Point first, Point second, Pen pen)
+			: this(first, second, pen)
 		{
 			Id = id;
 		}
@@ -96,12 +67,25 @@ namespace P1XCS000090.Shapes
 		// Public Methods
 		// *******************************************************************************
 
-
+		/// <summary>
+		/// カスタムコントロールへ提供されるコンテキストを用いて描画する。
+		/// </summary>
+		/// <param name="dc"></param>
+		public void DraftLine(DrawingContext dc)
+        {
+			dc.DrawLine(Pen, First, Second);
+        }
+		public void DraftLine(DrawingContext dc, Point first, Point second, double ratio, Point cursorPosition)
+        {
+			Point f = new Point(first.X * ratio, first.Y * ratio);
+			Point s = new Point(second.X * ratio, second.Y * ratio);
+			dc.DrawLine(Pen, f, s);
+        }
 
 
 
 		// *******************************************************************************
-		// Operator Overload
+		// Operator Override
 		// *******************************************************************************
 
 

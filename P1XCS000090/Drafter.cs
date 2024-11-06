@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 
 using P1XCS000090.Commands;
 using P1XCS000090.Shapes;
+using P1XCS000090.Math;
 
 namespace P1XCS000090
 {
@@ -67,8 +68,11 @@ namespace P1XCS000090
 		// Fields 
 		// *********************************************************************
 
+		// ダーク
 		private Brush _backGroundBrush = new SolidColorBrush(Color.FromRgb(24,25,28));
+		// ホワイト
 		private Brush _foreGroundBrush = new SolidColorBrush(Colors.White);
+		// カーソル座標
 		private Point _cursorPosition;
 		
 
@@ -86,33 +90,21 @@ namespace P1XCS000090
 		/// <summary>
 		/// 線分オブジェクト
 		/// </summary>
-		public List<Line> LineSize { get; private set; } = new List<Line>();
+		public List<DrLine> LineSize { get; private set; } = new List<DrLine>();
 		/// <summary>
 		/// 円オブジェクト
 		/// </summary>
-		public List<Circle> CircleSize { get; private set; } = new List<Circle>();
+		public List<DrCircle> CircleSize { get; private set; } = new List<DrCircle>();
 
 
 
 		// *********************************************************************
 		// Dependency Properyies
 		// *********************************************************************
-		/*
-		public static readonly DependencyProperty LinesProperty
-			= DependencyProperty.Register(
-				"Lines",
-				typeof(List<Line>),
-				typeof(Drafter),
-				new PropertyMetadata(
-					new(),
-					(d, e) => { }));
-		public List<Line> Lines
-		{
-			get => (List<Line>)GetValue(LinesProperty);
-			set => SetValue(LinesProperty, value);
-		}
-		*/
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static readonly DependencyProperty CommandMessageProperty
 			= DependencyProperty.Register(
 				"CommandMessage",
@@ -126,6 +118,10 @@ namespace P1XCS000090
 			get => (CommandMessage)GetValue(CommandMessageProperty);
 			set => SetValue(CommandMessageProperty, value);
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static readonly DependencyProperty ThemeProperty
 			= DependencyProperty.Register(
 				"Theme",
@@ -142,6 +138,11 @@ namespace P1XCS000090
 			get => (DisplayTheme)GetValue(ThemeProperty);
 			set => SetValue(ThemeProperty, value);
 		}
+
+		/// <summary>
+		/// OnRenderの意図的な呼び出しを行う為の依存関係プロパティ
+		/// bool値の切替のみを行う
+		/// </summary>
 		public static readonly DependencyProperty ReloadProperty
 			= DependencyProperty.Register(
 				"Reload",
@@ -167,13 +168,15 @@ namespace P1XCS000090
 		{
 			// 
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Drafter), new FrameworkPropertyMetadata(typeof(Drafter)));
-
+			
 			/*
-			int lineSz = Marshal.SizeOf(typeof(Line));
-			int circleSz = Marshal.SizeOf(typeof(Circle));
-
-			int a = 0;
+			int lineSz = Marshal.SizeOf<Line>();
+			int circleSz = Marshal.SizeOf<Circle>();
 			*/
+
+			int ownerOrigin = Marshal.SizeOf(typeof(OwnerOrigin));
+			
+			int a = 0;
 		}
 
 
@@ -307,15 +310,17 @@ namespace P1XCS000090
 			int delta = e.Delta;
 			if (delta > 0 && Ratio < 100)
 			{
+				// 拡大
 				Ratio = Ratio * 1.125;
+				// 状態変更（OnRender呼び出しのため）
 				Reload = !Reload;
-				// OnRender(_drawingContext);
 			}
 			else if (delta < 0 && Ratio >= 0.01)
 			{
+				// 縮小
 				Ratio = Ratio * 0.875;
+				// 状態変更（OnRender呼び出しのため）
 				Reload = !Reload;
-				// OnRender(_drawingContext);
 			}
 
 
@@ -349,6 +354,17 @@ namespace P1XCS000090
 				cursorPosition.Y - objectPosition.Y * ratio;
 
 			return new Point(resultPositionX, resultPositionY);
+        }
+
+		private bool IsNegative(Point first, Point second, Point basePos)
+        {
+			// オブジェクト座標（first.X, second.X）と拡大中心座標basePos.X
+			if ((first.X + second.X) - basePos.X < 0)
+            {
+
+            }
+
+			return false;
         }
 	}
 }

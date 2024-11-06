@@ -8,5 +8,5 @@
     <!--Grid ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
 		
 	</Grid-->
-	<con:Drafter CommandMessage="{Binding A}"/>
+	<con:Drafter/>
 </Window>
