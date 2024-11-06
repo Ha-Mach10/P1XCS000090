@@ -22,11 +22,15 @@ namespace P1XCS000090.Math
         public double OffsetY { get; }
 
 
-
-        public OwnerOrigin(double offsetX, double offsetY)
+        public OwnerOrigin(double ownerWidth, double ownerHeight)
         {
-            OffsetX = offsetX;
-            OffsetY = offsetY;
+            OffsetX = ownerWidth / 2;
+            OffsetY = ownerHeight / 2;
+        }
+        public OwnerOrigin(double ownerWidth, double ownerHeight, double offsetX, double offsetY)
+        {
+            OffsetX = ownerWidth - offsetX;
+            OffsetY = ownerHeight - offsetY;
         }
     }
 }
