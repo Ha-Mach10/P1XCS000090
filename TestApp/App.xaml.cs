@@ -1,4 +1,6 @@
-﻿using Prism.Ioc;
+﻿using MahApps.Metro.Controls;
+using Prism.DryIoc;
+using Prism.Ioc;
 using System.Windows;
 using TestApp.Views;
 
@@ -7,7 +9,7 @@ namespace TestApp
 	/// <summary>
 	/// Interaction logic for App.xaml
 	/// </summary>
-	public partial class App
+	public partial class App : PrismApplication
 	{
 		protected override Window CreateShell()
 		{

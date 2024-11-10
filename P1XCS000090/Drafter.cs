@@ -82,19 +82,19 @@ namespace P1XCS000090
 		// Properyies
 		// *********************************************************************
 
-		public System.Drawing.Size Size { get; private set; }
+		public static System.Drawing.Size Size { get; private set; }
 		/// <summary>
 		/// 画面倍率
 		/// </summary>
-		public double Ratio { get; private set; } = 1.0;
+		public static double Ratio { get; private set; } = 1.0;
 		/// <summary>
 		/// 線分オブジェクト
 		/// </summary>
-		public List<DrLine> LineSize { get; private set; } = new List<DrLine>();
+		public static List<DrLine> Lines { get; private set; } = new List<DrLine>();
 		/// <summary>
 		/// 円オブジェクト
 		/// </summary>
-		public List<DrCircle> CircleSize { get; private set; } = new List<DrCircle>();
+		public static List<DrCircle> Circles { get; private set; } = new List<DrCircle>();
 
 
 
@@ -175,7 +175,11 @@ namespace P1XCS000090
 			*/
 
 			int ownerOrigin = Marshal.SizeOf(typeof(OwnerOrigin));
-			
+
+
+			DrLine drLine = new DrLine(new Point(100, 100), new Point(300, 300), new Pen(new SolidColorBrush(Colors.White), 1));
+			Lines.Add(drLine);
+
 			int a = 0;
 		}
 
@@ -207,7 +211,12 @@ namespace P1XCS000090
 			// 基底メソッドの呼び出し
 			base.OnRender(dc);
 
+			foreach (DrLine line in Lines)
+			{
+				line.DraftLine(dc, _cursorPosition, Ratio);
+			}
 
+			/*
 			double positionA = 100 * Ratio;
 			double positionB = 300 * Ratio;
 			Point firstPoint1 = new Point(positionA, positionA);
@@ -217,7 +226,7 @@ namespace P1XCS000090
 			Vector vector = new Vector(_cursorPosition.X * Ratio, _cursorPosition.Y * Ratio);
 			Point firstPoint2 =  Point.Subtract(new Point(positionA, positionA), vector);
 			Point secondPoint2 = Point.Subtract(new Point(positionB, positionB), vector);
-			
+			*/
 			/*
 			Matrix matrixFirst = new Matrix(100, 0, 0, 100, 0, 0);
 			Matrix matrixSecond = new Matrix(300, 0, 0, 300, 0, 0);
@@ -227,7 +236,9 @@ namespace P1XCS000090
 			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), new Point(matrixFirst.M11, matrixFirst.M22), new Point(matrixSecond.M11, matrixSecond.M22));
 			*/
 
-			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), CalculatePosition(firstPoint1, _cursorPosition, Ratio), CalculatePosition(secondPoint1, _cursorPosition, Ratio));
+			
+
+			// dc.DrawLine(new Pen(_foreGroundBrush, 2.0), CalculatePosition(firstPoint1, _cursorPosition, Ratio), CalculatePosition(secondPoint1, _cursorPosition, Ratio));
 		}
 		/// <summary>
 		/// テンプレートの適用を行うメソッド

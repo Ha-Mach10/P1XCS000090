@@ -54,11 +54,26 @@ namespace P1XCS000090.Shapes
 			double x = First.X <= Second.X ? First.X - Second.X : Second.X - First.X;
 			double y = First.Y >= Second.Y ? First.Y - Second.Y : Second.Y - First.Y;
 			CenterPoint = new DrPoint(x, y);
+
+
 		}
 		public DrLine(int id, Point first, Point second, Pen pen)
 			: this(first, second, pen)
 		{
 			Id = id;
+		}
+		public DrLine(DrPoint first, DrPoint second, Pen pen) : base()
+		{
+			_idCount++;
+
+			Id = _idCount;
+			First = first;
+			Second = second;
+			Pen = pen;
+
+			double x = First.X <= Second.X ? First.X - Second.X : Second.X - First.X;
+			double y = First.Y >= Second.Y ? First.Y - Second.Y : Second.Y - First.Y;
+			CenterPoint = new DrPoint(x, y);
 		}
 
 
@@ -68,35 +83,71 @@ namespace P1XCS000090.Shapes
 		// *******************************************************************************
 
 		/// <summary>
-		/// カスタムコントロールへ提供されるコンテキストを用いて描画する。
+		/// 
 		/// </summary>
 		/// <param name="dc"></param>
-		public void DraftLine(DrawingContext dc)
-        {
-			dc.DrawLine(Pen, DrPointToPoint(First), DrPointToPoint(Second));
-        }
-		public void DraftLine(DrawingContext dc, Point first, Point second, double ratio, Point cursorPosition)
+		/// <param name="first"></param>
+		/// <param name="second"></param>
+		/// <param name="cursorPosition"></param>
+		/// <param name="ratio"></param>
+		/// <param name="pen"></param>
+		public void DraftLine(DrawingContext dc, Point first, Point second, Point cursorPosition, double ratio)
         {
 			Point f = new Point(first.X * ratio, first.Y * ratio);
 			Point s = new Point(second.X * ratio, second.Y * ratio);
 			dc.DrawLine(Pen, f, s);
         }
-		public void ReScaleLine(double rate, Point cursorPoint, DrLine targetLine)
+		/// <summary>
+		/// 線を描画
+		/// </summary>
+		/// <param name="dc"><see cref="DrawingContext"/>描画をサポートするコンテキスト</param>
+		/// <param name="cursorPosition">カーソル位置</param>
+		/// <param name="rate">拡大倍率</param>
+		public void DraftLine(DrawingContext dc, Point cursorPosition, double rate)
 		{
-			DrPoint drPointFirst = base.ReScale(rate, cursorPoint, targetLine.First);
-			DrPoint drPointSecond = base.ReScale(rate, cursorPoint, targetLine.Second);
-
-			
+			// 再スケーリング
+			(DrPoint first, DrPoint second) = ReScaleLine(rate, cursorPosition, this);
+			// 描画開始
+			DoDraft(dc, first, second);
 		}
 
 
 
 		// *******************************************************************************
-		// Public Methods
+		// Private Methods
 		// *******************************************************************************
 
+		/// <summary>
+		/// System.Windows.PointからP1XCS00090.Shapes.DrPointへの変換をサポート
+		/// </summary>
+		/// <param name="point"></param>
+		/// <returns></returns>
 		private Point DrPointToPoint(DrPoint point)
 			=> new Point(point.X, point.Y);
+
+		/// <summary>
+		/// カスタムコントロールへ提供されるコンテキストを用いて描画する。
+		/// </summary>
+		/// <param name="dc"></param>
+		private void DoDraft(DrawingContext dc, DrPoint first, DrPoint second)
+		{
+			dc.DrawLine(Pen, DrPointToPoint(first), DrPointToPoint(second));
+		}
+
+		/// <summary>
+		/// 始点・終点を提供された倍率およびマウスカーソルの座標に従い再計算
+		/// </summary>
+		/// <param name="rate"></param>
+		/// <param name="cursorPoint"></param>
+		/// <param name="targetLine"></param>
+		/// <returns></returns>
+		private (DrPoint first, DrPoint second) ReScaleLine(double rate, Point cursorPoint, DrLine targetLine)
+		{
+			DrPoint drPointFirst = ReScale(rate, cursorPoint, targetLine.First);
+			DrPoint drPointSecond = ReScale(rate, cursorPoint, targetLine.Second);
+
+			return (drPointFirst, drPointSecond);
+		}
 
 
 

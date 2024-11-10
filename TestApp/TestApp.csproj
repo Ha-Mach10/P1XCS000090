@@ -5,7 +5,10 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0" />
     <PackageReference Include="Prism.DryIoc" Version="9.0.537" />
+    <PackageReference Include="ReactiveProperty.WPF" Version="9.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\P1XCS000090\P1XCS000090.csproj" />
