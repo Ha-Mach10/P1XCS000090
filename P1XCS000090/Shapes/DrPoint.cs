@@ -39,6 +39,7 @@ namespace P1XCS000090.Shapes
 
 		public DrPoint ReScale(double rate, Point cursorPosition, DrPoint targetPoint)
 		{
+			/*
 			// カーソル点を仮想原点とし、仮想原点からのＸの位置を定義
 			double ImaginalyOriginX = targetPoint.X - cursorPosition.X;
 			// 仮想原点から位置Ｘへ倍率を乗算
@@ -53,6 +54,48 @@ namespace P1XCS000090.Shapes
 			}
 			else
 			{
+				// 仮想原点としたカーソル点を加算し、実際の位置Ｘを算出
+				reScaleX = cursorPosition.X - reScaledPositionX;
+			}
+
+
+			// カーソル点を仮想原点とし、仮想原点からのＹの位置を定義
+			double imaginaryOriginY = targetPoint.Y - cursorPosition.Y;
+			// 仮想原点から位置Ｙへ倍率を乗算
+			double reScaledPositionY = imaginaryOriginY * rate;
+
+			// 
+			double reScaleY = 0;
+			if (cursorPosition.Y > targetPoint.Y)
+			{
+				// 仮想原点としたカーソル点を加算し、実際の位置Ｙを算出
+				reScaleY = cursorPosition.Y + reScaledPositionY;
+			}
+			else
+			{
+				// 仮想原点としたカーソル点を加算し、実際の位置Ｙを算出
+				reScaleY = cursorPosition.Y - reScaledPositionY;
+			}
+
+			return new DrPoint(reScaleX, reScaleY);
+			*/
+
+			// カーソル点を仮想原点とし、仮想原点からのＸの位置を定義
+			double ImaginalyOriginX = 0;
+			// 仮想原点から位置Ｘへ倍率を乗算
+			double reScaledPositionX = ImaginalyOriginX * rate;
+
+			// 再スケールされたＸの位置
+			double reScaleX = 0;
+			if (cursorPosition.X > targetPoint.X)
+			{
+				ImaginalyOriginX = cursorPosition.X - targetPoint.X;
+				// 仮想原点としたカーソル点を加算し、実際の位置Ｘを算出
+				reScaleX = cursorPosition.X + reScaledPositionX;
+			}
+            else
+            {
+				ImaginalyOriginX = targetPoint.X - cursorPosition.X;
 				// 仮想原点としたカーソル点を加算し、実際の位置Ｘを算出
 				reScaleX = cursorPosition.X - reScaledPositionX;
 			}
