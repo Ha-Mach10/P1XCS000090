@@ -65,15 +65,21 @@ namespace P1XCS000090
 
 
 		// *********************************************************************
-		// Fields 
+		// Static Fields 
 		// *********************************************************************
 
-		// ダーク
-		private Brush _backGroundBrush = new SolidColorBrush(Color.FromRgb(24,25,28));
-		// ホワイト
-		private Brush _foreGroundBrush = new SolidColorBrush(Colors.White);
+		// ダークテーマ
+		private static Brush _backGroundBrush = new SolidColorBrush(Color.FromRgb(24,25,28));
+		// ホワイトテーマ
+		private static Brush _foreGroundBrush = new SolidColorBrush(Colors.White);
+
 		// カーソル座標
-		private Point _cursorPosition;
+		private static Point _cursorPosition;
+		// マトリックス
+		private static Matrix _matrixAffine;
+
+		// 初期化されたかを示す状態
+		private static bool s_InitializedFlag = false;
 		
 
 
@@ -86,7 +92,7 @@ namespace P1XCS000090
 		/// <summary>
 		/// 画面倍率
 		/// </summary>
-		public static double Ratio { get; private set; } = 1.0;
+		public static double Scale { get; private set; } = 1.0;
 		/// <summary>
 		/// 線分オブジェクト
 		/// </summary>
@@ -166,21 +172,10 @@ namespace P1XCS000090
 
 		static Drafter()
 		{
-			// 
+			// プロパティのメタデータをオーバーライド
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Drafter), new FrameworkPropertyMetadata(typeof(Drafter)));
-			
-			/*
-			int lineSz = Marshal.SizeOf<Line>();
-			int circleSz = Marshal.SizeOf<Circle>();
-			*/
 
-			int ownerOrigin = Marshal.SizeOf(typeof(OwnerOrigin));
-
-
-			DrLine drLine = new DrLine(new Point(100, 100), new Point(300, 300), new Pen(new SolidColorBrush(Colors.White), 1));
-			Lines.Add(drLine);
-
-			int a = 0;
+			// 
 		}
 
 
@@ -211,34 +206,16 @@ namespace P1XCS000090
 			// 基底メソッドの呼び出し
 			base.OnRender(dc);
 
+			if (s_InitializedFlag is false)
+            {
+				Initialize();
+            }
+
 			foreach (DrLine line in Lines)
 			{
-				line.DraftLine(dc, _cursorPosition, Ratio);
+				line.DraftLine(dc, _cursorPosition, Scale);
 			}
 
-			/*
-			double positionA = 100 * Ratio;
-			double positionB = 300 * Ratio;
-			Point firstPoint1 = new Point(positionA, positionA);
-			Point secondPoint1 = new Point(positionB, positionB);
-
-			
-			Vector vector = new Vector(_cursorPosition.X * Ratio, _cursorPosition.Y * Ratio);
-			Point firstPoint2 =  Point.Subtract(new Point(positionA, positionA), vector);
-			Point secondPoint2 = Point.Subtract(new Point(positionB, positionB), vector);
-			*/
-			/*
-			Matrix matrixFirst = new Matrix(100, 0, 0, 100, 0, 0);
-			Matrix matrixSecond = new Matrix(300, 0, 0, 300, 0, 0);
-			matrixFirst.Scale(Ratio, Ratio);
-			matrixSecond.Scale(Ratio, Ratio);
-
-			dc.DrawLine(new Pen(_foreGroundBrush, 2.0), new Point(matrixFirst.M11, matrixFirst.M22), new Point(matrixSecond.M11, matrixSecond.M22));
-			*/
-
-			
-
-			// dc.DrawLine(new Pen(_foreGroundBrush, 2.0), CalculatePosition(firstPoint1, _cursorPosition, Ratio), CalculatePosition(secondPoint1, _cursorPosition, Ratio));
 		}
 		/// <summary>
 		/// テンプレートの適用を行うメソッド
@@ -300,36 +277,43 @@ namespace P1XCS000090
 			{
 				if (e.ClickCount is 2)
                 {
-					Ratio = 1;
+					Scale = 1;
 					_cursorPosition = new Point(0, 0);
 					Reload = !Reload;
                 }
 			}
 		}
 
+		/// <summary>
+		/// マウスホイールイベント
+		/// 拡大・縮小時の倍率を設定
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnMouseWheel(MouseWheelEventArgs e)
 		{
+			// 基底メソッド呼び出し
 			base.OnMouseWheel(e);
 
 			// 入力デバイスを取得
-			IInputElement device = null;
-			device = e.Device as IInputElement;
+			IInputElement device = e.Device as IInputElement;
+
 			// 現在のマウス位置を取得
 			_cursorPosition = e.GetPosition(device);
 
 			// ホイールのデルタ値を取得
 			int delta = e.Delta;
-			if (delta > 0 && Ratio < 100)
+
+			if (delta > 0 && Scale < 100)
 			{
 				// 拡大
-				Ratio = Ratio * 1.125;
+				Scale = Scale * 1.125;
 				// 状態変更（OnRender呼び出しのため）
 				Reload = !Reload;
 			}
-			else if (delta < 0 && Ratio >= 0.01)
+			else if (delta < 0 && Scale >= 0.01)
 			{
 				// 縮小
-				Ratio = Ratio * 0.875;
+				Scale = Scale * 0.875;
 				// 状態変更（OnRender呼び出しのため）
 				Reload = !Reload;
 			}
@@ -353,29 +337,15 @@ namespace P1XCS000090
 		// Private Methods
 		// *********************************************************************
 
-		private Point CalculatePosition(Point objectPosition, Point cursorPosition, double ratio)
+		private void Initialize()
         {
-			double resultPositionX =
-				objectPosition.X > cursorPosition.X ?
-				objectPosition.X * ratio + cursorPosition.X :
-				cursorPosition.X - objectPosition.X * ratio;
-			double resultPositionY =
-				objectPosition.Y > cursorPosition.Y ?
-				objectPosition.Y * ratio + cursorPosition.Y :
-				cursorPosition.Y - objectPosition.Y * ratio;
+			// 
+			s_InitializedFlag = true;
 
-			return new Point(resultPositionX, resultPositionY);
-        }
+			// Initialize Properties
 
-		private bool IsNegative(Point first, Point second, Point basePos)
-        {
-			// オブジェクト座標（first.X, second.X）と拡大中心座標basePos.X
-			if ((first.X + second.X) - basePos.X < 0)
-            {
-
-            }
-
-			return false;
+			// 描画変形の原点を定義
+			RenderTransformOrigin = new Point(0.5, 0.5);
         }
 	}
 }

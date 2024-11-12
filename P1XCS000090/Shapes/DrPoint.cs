@@ -5,18 +5,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
+using System.Drawing.Drawing2D;
 
 namespace P1XCS000090.Shapes
 {
 	public class DrPoint
 	{
-		public double X { get; }
-		public double Y { get; }
+		// *********************************************************************
+		// Static Fields 
+		// *********************************************************************
 
+		/// <summary>
+		/// アフィン変換に利用するための内部変数
+		/// </summary>
+		private Matrix _matrix;
+
+
+
+		// *********************************************************************
+		// Properties 
+		// *********************************************************************
+
+		public double X { get; set; }
+		public double Y { get; set; }
+
+
+
+		// *********************************************************************
+		// Constructors 
+		// *********************************************************************
 
 		public DrPoint()
 		{
+			// 
+			_matrix = new Matrix();
+
 			X = 0;
 			Y = 0;
 		}
@@ -33,99 +56,27 @@ namespace P1XCS000090.Shapes
 
 
 
+		// *********************************************************************
+		// Public Methods 
+		// *********************************************************************
 
-		public DrPoint ReScale(double rate, Point cursorPosition)
-			=> ReScale(rate, cursorPosition, this);
-
-		public DrPoint ReScale(double rate, Point cursorPosition, DrPoint targetPoint)
+		/// <summary>
+		/// 点の位置をスケーリングする
+		/// </summary>
+		/// <param name="scale">スケール倍率</param>
+		/// <param name="cursorPosition">カーソル位置</param>
+		/// <param name="mat">マトリックス</param>
+		/// <returns></returns>
+		public DrPoint ReScale(double scale, Point cursorPosition)
 		{
-			/*
-			// カーソル点を仮想原点とし、仮想原点からのＸの位置を定義
-			double ImaginalyOriginX = targetPoint.X - cursorPosition.X;
-			// 仮想原点から位置Ｘへ倍率を乗算
-			double reScaledPositionX = ImaginalyOriginX * rate;
+			// スケーリング（アフィン変換）
+			_matrix.ScaleAt(scale, cursorPosition);
 
-			// 
-			double reScaleX = 0;
-			if (cursorPosition.X > targetPoint.X)
-			{
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｘを算出
-				reScaleX = cursorPosition.X + reScaledPositionX;
-			}
-			else
-			{
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｘを算出
-				reScaleX = cursorPosition.X - reScaledPositionX;
-			}
+			System.Drawing.Point[] points = new System.Drawing.Point[0];
+			_matrix.TransformPoints(points);
 
-
-			// カーソル点を仮想原点とし、仮想原点からのＹの位置を定義
-			double imaginaryOriginY = targetPoint.Y - cursorPosition.Y;
-			// 仮想原点から位置Ｙへ倍率を乗算
-			double reScaledPositionY = imaginaryOriginY * rate;
-
-			// 
-			double reScaleY = 0;
-			if (cursorPosition.Y > targetPoint.Y)
-			{
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｙを算出
-				reScaleY = cursorPosition.Y + reScaledPositionY;
-			}
-			else
-			{
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｙを算出
-				reScaleY = cursorPosition.Y - reScaledPositionY;
-			}
-
-			return new DrPoint(reScaleX, reScaleY);
-			*/
-
-			// カーソル点を仮想原点とし、仮想原点からのＸの位置を定義
-			double ImaginalyOriginX = 0;
-			// 仮想原点から位置Ｘへ倍率を乗算
-			double reScaledPositionX = 0;
-
-			// 再スケールされたＸの位置
-			double reScaleX = 0;
-			if (cursorPosition.X > targetPoint.X)
-			{
-				ImaginalyOriginX = targetPoint.X - cursorPosition.X;
-				reScaledPositionX = ImaginalyOriginX * rate;
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｘを算出
-				reScaleX = cursorPosition.X + reScaledPositionX;
-			}
-            else
-            {
-				ImaginalyOriginX = targetPoint.X - cursorPosition.X;
-				reScaledPositionX = ImaginalyOriginX * rate;
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｘを算出
-				reScaleX = targetPoint.X + reScaledPositionX;
-			}
-
-
-			// カーソル点を仮想原点とし、仮想原点からのＹの位置を定義
-			double imaginaryOriginY = 0;
-			// 仮想原点から位置Ｙへ倍率を乗算
-			double reScaledPositionY = 0;
-
-			// 
-			double reScaleY = 0;
-			if (cursorPosition.Y > targetPoint.Y)
-			{
-				imaginaryOriginY = targetPoint.Y - cursorPosition.Y;
-				reScaledPositionY = imaginaryOriginY * rate;
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｙを算出
-				reScaleY = cursorPosition.Y + reScaledPositionY;
-			}
-			else
-			{
-				imaginaryOriginY = targetPoint.Y + cursorPosition.Y;
-				reScaledPositionY = imaginaryOriginY * rate;
-				// 仮想原点としたカーソル点を加算し、実際の位置Ｙを算出
-				reScaleY = targetPoint.Y + reScaledPositionY;
-			}
-
-			return new DrPoint(reScaleX, reScaleY);
+			// return new DrPoint(points)
+			return new DrPoint(cursorPosition.X, cursorPosition.Y);
 		}
 	}
 }

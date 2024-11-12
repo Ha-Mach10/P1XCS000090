@@ -58,6 +58,7 @@
     <Compile Include="Drafter.cs" />
     <Compile Include="Math\Affine.cs" />
     <Compile Include="Math\Coordinate.cs" />
+    <Compile Include="Math\MatrixExtentions.cs" />
     <Compile Include="Math\OwnerOrigin.cs" />
     <Compile Include="Shapes\DrCircle.cs" />
     <Compile Include="Shapes\DrLine.cs" />

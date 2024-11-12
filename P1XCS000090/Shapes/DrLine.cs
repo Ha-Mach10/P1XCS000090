@@ -31,10 +31,10 @@ namespace P1XCS000090.Shapes
 		// *******************************************************************************
 
 		public int Id { get; }
-		public DrPoint First { get; }
-		public DrPoint Second { get; }
-		public DrPoint CenterPoint { get; }
-		public Pen Pen { get; }
+		public DrPoint First { get; set; }
+		public DrPoint Second { get; set; }
+		public DrPoint MiddlePoint { get; private set; }
+		public Pen Pen { get; set; }
 
 
 
@@ -42,38 +42,29 @@ namespace P1XCS000090.Shapes
 		// Constructors
 		// *******************************************************************************
 
-		public DrLine(Point first, Point second, Pen pen) : base()
+		public DrLine(Drafter drafter, Point first, Point second, Pen pen) : base()
 		{
 			_idCount++;
+
 
 			Id = _idCount;
 			First = new DrPoint(first);
 			Second = new DrPoint(second);
 			Pen = pen;
 
-			double x = First.X <= Second.X ? First.X - Second.X : Second.X - First.X;
-			double y = First.Y >= Second.Y ? First.Y - Second.Y : Second.Y - First.Y;
-			CenterPoint = new DrPoint(x, y);
-
-
-		}
-		public DrLine(int id, Point first, Point second, Pen pen)
-			: this(first, second, pen)
-		{
-			Id = id;
+			SetMiddlePoint();
 		}
 		public DrLine(DrPoint first, DrPoint second, Pen pen) : base()
 		{
 			_idCount++;
+
 
 			Id = _idCount;
 			First = first;
 			Second = second;
 			Pen = pen;
 
-			double x = First.X <= Second.X ? First.X - Second.X : Second.X - First.X;
-			double y = First.Y >= Second.Y ? First.Y - Second.Y : Second.Y - First.Y;
-			CenterPoint = new DrPoint(x, y);
+			SetMiddlePoint();
 		}
 
 
@@ -92,11 +83,11 @@ namespace P1XCS000090.Shapes
 		/// <param name="ratio"></param>
 		/// <param name="pen"></param>
 		public void DraftLine(DrawingContext dc, Point first, Point second, Point cursorPosition, double ratio)
-        {
+		{
 			Point f = new Point(first.X * ratio, first.Y * ratio);
 			Point s = new Point(second.X * ratio, second.Y * ratio);
 			dc.DrawLine(Pen, f, s);
-        }
+		}
 		/// <summary>
 		/// 線を描画
 		/// </summary>
@@ -143,10 +134,17 @@ namespace P1XCS000090.Shapes
 		/// <returns></returns>
 		private (DrPoint first, DrPoint second) ReScaleLine(double rate, Point cursorPoint, DrLine targetLine)
 		{
-			DrPoint drPointFirst = ReScale(rate, cursorPoint, targetLine.First);
-			DrPoint drPointSecond = ReScale(rate, cursorPoint, targetLine.Second);
-
-			return (drPointFirst, drPointSecond);
+			return new(null, null);
+			// return (drPointFirst, drPointSecond);
+		}
+		/// <summary>
+		/// プロパティに設定された開始点-終了点の2等分点をMiddlePointプロパティにセット
+		/// </summary>
+		private void SetMiddlePoint()
+		{
+			double x = First.X <= Second.X ? First.X - Second.X : Second.X - First.X;
+			double y = First.Y >= Second.Y ? First.Y - Second.Y : Second.Y - First.Y;
+			MiddlePoint = new DrPoint(x, y);
 		}
 
 
