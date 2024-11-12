@@ -28,6 +28,7 @@ namespace P1XCS000090.Shapes
 
 		public double X { get; set; }
 		public double Y { get; set; }
+		public virtual Matrix Matrix { get; }
 
 
 
@@ -35,20 +36,23 @@ namespace P1XCS000090.Shapes
 		// Constructors 
 		// *********************************************************************
 
-		public DrPoint()
+		public DrPoint(Matrix matrix)
 		{
 			// 
 			_matrix = new Matrix();
 
 			X = 0;
 			Y = 0;
+			Matrix = matrix;
 		}
-		public DrPoint(double x, double y) : this()
+		public DrPoint(Matrix matrix, double x, double y)
+			: this(matrix)
 		{
 			X = x;
 			Y = y;
 		}
-		public DrPoint(Point point) : this()
+		public DrPoint(Matrix matrix, Point point)
+			: this(matrix)
 		{
 			X = point.X;
 			Y = point.Y;
@@ -60,12 +64,12 @@ namespace P1XCS000090.Shapes
 		// Public Methods 
 		// *********************************************************************
 
+		
 		/// <summary>
 		/// 点の位置をスケーリングする
 		/// </summary>
 		/// <param name="scale">スケール倍率</param>
 		/// <param name="cursorPosition">カーソル位置</param>
-		/// <param name="mat">マトリックス</param>
 		/// <returns></returns>
 		public DrPoint ReScale(double scale, Point cursorPosition)
 		{

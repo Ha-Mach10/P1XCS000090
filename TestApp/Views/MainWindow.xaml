@@ -40,9 +40,6 @@
 			<Button Content="直線" Command="{Binding DoWriteLine}" Style="{StaticResource MyButton}"/>
 		</StackPanel>
 
-		<con:Drafter x:Name="MyDrafter" Grid.Row="1" />
-		<Canvas Grid.Row="1" Grid.Column="1" Background="Black">
-			<Line X1="10" Y1="10" X2="50" Y2="50" Stroke="White" StrokeThickness="1"/>
-		</Canvas>
+		<con:Drafter x:Name="MyDrafter" Grid.Row="1" Grid.ColumnSpan="2"/>
 	</Grid>
 </mah:MetroWindow>

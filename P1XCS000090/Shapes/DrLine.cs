@@ -94,12 +94,17 @@ namespace P1XCS000090.Shapes
 		/// <param name="dc"><see cref="DrawingContext"/>描画をサポートするコンテキスト</param>
 		/// <param name="cursorPosition">カーソル位置</param>
 		/// <param name="rate">拡大倍率</param>
-		public void DraftLine(DrawingContext dc, Point cursorPosition, double rate)
+		public void DraftLine(DrawingContext dc, Point cursorPosition, double scale)
 		{
 			// 再スケーリング
-			(DrPoint first, DrPoint second) = ReScaleLine(rate, cursorPosition, this);
+			(DrPoint first, DrPoint second) = ReScaleLine(scale, cursorPosition, this);
 			// 描画開始
 			DoDraft(dc, first, second);
+		}
+		public void DraftLine(DrawingContext dc)
+		{
+			// 描画開始
+			DoDraft(dc, First, Second);
 		}
 
 

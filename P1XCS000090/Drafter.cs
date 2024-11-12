@@ -18,6 +18,8 @@ using System.Runtime.InteropServices;
 using P1XCS000090.Commands;
 using P1XCS000090.Shapes;
 using P1XCS000090.Math;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media.Animation;
 
 namespace P1XCS000090
 {
@@ -69,14 +71,16 @@ namespace P1XCS000090
 		// *********************************************************************
 
 		// ダークテーマ
-		private static Brush _backGroundBrush = new SolidColorBrush(Color.FromRgb(24,25,28));
+		private static Brush s_backGroundBrush = new SolidColorBrush(Color.FromRgb(24,25,28));
 		// ホワイトテーマ
-		private static Brush _foreGroundBrush = new SolidColorBrush(Colors.White);
+		private static Brush s_foreGroundBrush = new SolidColorBrush(Colors.White);
 
+		// 
+		private static Rect s_rectangle;
 		// カーソル座標
-		private static Point _cursorPosition;
+		private static Point s_cursorPosition;
 		// マトリックス
-		private static Matrix _matrixAffine;
+		private static Matrix s_matrixAffine;
 
 		// 初期化されたかを示す状態
 		private static bool s_InitializedFlag = false;
@@ -88,11 +92,11 @@ namespace P1XCS000090
 		// Properyies
 		// *********************************************************************
 
-		public static System.Drawing.Size Size { get; private set; }
+		public System.Drawing.Size Size { get; private set; }
 		/// <summary>
 		/// 画面倍率
 		/// </summary>
-		public static double Scale { get; private set; } = 1.0;
+		public double Scale { get; private set; } = 1.0;
 		/// <summary>
 		/// 線分オブジェクト
 		/// </summary>
@@ -176,6 +180,8 @@ namespace P1XCS000090
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Drafter), new FrameworkPropertyMetadata(typeof(Drafter)));
 
 			// 
+			DrLine drLine = new DrLine(new DrPoint(100, 100), new DrPoint(300, 300), new Pen(new SolidColorBrush(Colors.White), 1));
+			Lines.Add(drLine);
 		}
 
 
@@ -213,7 +219,7 @@ namespace P1XCS000090
 
 			foreach (DrLine line in Lines)
 			{
-				line.DraftLine(dc, _cursorPosition, Scale);
+				line.DraftLine(dc);
 			}
 
 		}
@@ -249,7 +255,7 @@ namespace P1XCS000090
 		}
 		protected override System.Windows.Size ArrangeOverride(System.Windows.Size arrangeSize)
 		{
-			Background = _backGroundBrush;
+			Background = s_backGroundBrush;
 			return base.ArrangeOverride(arrangeSize);
 		}
 		/// <summary>
@@ -278,7 +284,7 @@ namespace P1XCS000090
 				if (e.ClickCount is 2)
                 {
 					Scale = 1;
-					_cursorPosition = new Point(0, 0);
+					s_cursorPosition = new Point(0, 0);
 					Reload = !Reload;
                 }
 			}
@@ -298,7 +304,7 @@ namespace P1XCS000090
 			IInputElement device = e.Device as IInputElement;
 
 			// 現在のマウス位置を取得
-			_cursorPosition = e.GetPosition(device);
+			s_cursorPosition = e.GetPosition(device);
 
 			// ホイールのデルタ値を取得
 			int delta = e.Delta;
@@ -318,7 +324,9 @@ namespace P1XCS000090
 				Reload = !Reload;
 			}
 
-
+			Matrix matrix = s_matrixAffine;
+			matrix.ScaleAtPrepend(Scale, Scale, s_cursorPosition.X, s_cursorPosition.Y);
+			RenderTransform = new MatrixTransform(matrix);
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
@@ -345,7 +353,19 @@ namespace P1XCS000090
 			// Initialize Properties
 
 			// 描画変形の原点を定義
-			RenderTransformOrigin = new Point(0.5, 0.5);
+			// RenderTransformOrigin = new Point(0.5, 0.5);
+			s_matrixAffine = (RenderTransform as MatrixTransform).Matrix;
+
+			// 
+			s_rectangle = new Rect(0, 0, ActualHeight, ActualWidth);
+
+			/*
+			// 
+			ScrollViewer scrollViewer = new ScrollViewer();
+			scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+			scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+			this.AddLogicalChild(scrollViewer);
+			*/
         }
 	}
 }
